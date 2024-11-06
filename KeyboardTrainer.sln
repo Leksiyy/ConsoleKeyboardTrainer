@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyboardTrainer", "KeyboardTrainer\KeyboardTrainer.csproj", "{283DD33E-3535-48F5-99A8-5AE248C29D1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{AA7DDE91-F809-4278-BF91-ABAEF3E125E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{283DD33E-3535-48F5-99A8-5AE248C29D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{283DD33E-3535-48F5-99A8-5AE248C29D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{283DD33E-3535-48F5-99A8-5AE248C29D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{283DD33E-3535-48F5-99A8-5AE248C29D1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA7DDE91-F809-4278-BF91-ABAEF3E125E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA7DDE91-F809-4278-BF91-ABAEF3E125E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA7DDE91-F809-4278-BF91-ABAEF3E125E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA7DDE91-F809-4278-BF91-ABAEF3E125E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
