@@ -6,13 +6,14 @@ namespace KeyboardTrainer.Menu;
 
 public static class Menu
 {
+    public static Game.Game Game = new Game.Game();
     public static async Task Display()
     {
         Console.Clear();
         Console.WriteLine("Welcome to Keyboard Trainer!");
         Console.WriteLine("Connecting to the server...");
         
-        Program.Client.ConnectAsync();
+        await Program.Client.ConnectAsync();
         
         Thread.Sleep(1000);
         
@@ -31,7 +32,7 @@ public static class Menu
                 switch (choose)
                 {
                     case "1":
-                        await KeyboardTrainer.Game.Game.Play();
+                        await Game.PlayAsync();
                         continue;
                     case "2":
                         ShowRecord();

@@ -1,8 +1,9 @@
-using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Server.Data;
 
-namespace BookStore.Data
+namespace Server.Factories
 {
     public class ApplicationContextFactory : IDesignTimeDbContextFactory<ApplicationContext>
     {

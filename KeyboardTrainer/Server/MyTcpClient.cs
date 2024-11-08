@@ -10,7 +10,7 @@ public class MyTcpClient : IDisposable
     private TcpClient _tcpClient = null!;
     private NetworkStream _networkStream = null!;
 
-    public async void ConnectAsync()
+    public async Task ConnectAsync()
     {
         try
         {

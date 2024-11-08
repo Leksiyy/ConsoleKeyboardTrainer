@@ -3,22 +3,37 @@ using KeyboardTrainer.Models;
 
 namespace KeyboardTrainer.Game;
 
-public static class Game
+public class Game
 {
-    public static async Task Play()
+    private static Random random = new Random();
+
+    public async Task PlayAsync()
     {
+        string[] wordsDictionary = {
+            "galaxy", "whisper", "mountain", "river", "storm",
+            "dream", "symphony", "puzzle", "journey", "flame",
+            "ocean", "voyage", "crystal", "echo", "twilight",
+            "memory", "horizon", "shadow", "silence", "mystery",
+            "ancient", "breeze", "canvas", "labyrinth", "whistle",
+            "ember", "miracle", "phantom", "realm", "adventure",
+            "fortune", "wander", "rhythm", "midnight", "wonder",
+            "compass", "myth", "forest", "glow", "riddle",
+            "treasure", "destiny", "whirlpool", "glimpse", "solitude",
+            "spark", "enigma", "legend", "haven", "cosmos"
+        };
+        
         Dictionary<int, bool> letterStatus = new Dictionary<int, bool>(); // словарь для хранения статуса каждой буквы (правильная/неправильная)
         (int, int, TimeSpan) stats = (0, 0, new TimeSpan()); // правильные, ошибки, время.
         Console.Clear();
         Console.WriteLine("Начните вводить текст:");
 
-        string word = "hello world";
-        Console.Write(word);
+        string testWords = string.Join(" ", GenerateWords(wordsDictionary));
+        Console.Write(testWords);
         int index = 0;
         DateTime startTime = default;
         ConsoleColor consoleColor = Console.BackgroundColor;
 
-        while (index <= word.Length)
+        while (index <= testWords.Length)
         {
             Console.SetCursorPosition(index, 1);
             ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
@@ -32,14 +47,14 @@ public static class Game
                     index--;
                     Console.SetCursorPosition(index, 1);
                     Console.ForegroundColor = ConsoleColor.Black;
-                    Console.Write(word[index]);
+                    Console.Write(testWords[index]);
                     Console.SetCursorPosition(index, 1);
                     Console.ResetColor();
                 }
                 continue;
             }
 
-            if (index >= word.Length) break;
+            if (index >= testWords.Length) break;
             
             char inputChar = keyInfo.KeyChar;
 
@@ -50,7 +65,7 @@ public static class Game
                 Console.BackgroundColor = consoleColor;
             }
             
-            if (inputChar == word[index])
+            if (inputChar == testWords[index])
             {
                 stats.Item1++;
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -75,16 +90,16 @@ public static class Game
         
         Console.ResetColor();
         
-        Console.WriteLine($"\nSTATS:\nTime taken: {stats.Item3.Seconds} seconds\nNumber of incorrect letters: {stats.Item2}\nAccuracy: {((double)stats.Item1 / word.Length)*100:F2}%");
+        Console.WriteLine($"\nSTATS:\nTime taken: {stats.Item3.Seconds} seconds\nNumber of incorrect letters: {stats.Item2}\nAccuracy: {((double)stats.Item1 / testWords.Length)*100:F2}%");
 
         Program.Client.SendAsync("SEND record");
         string recordJson = await Program.Client.ReceiveAsync();
         Statistics statistics = JsonSerializer.Deserialize<Statistics>(recordJson);
-        if (statistics is not null && word.Length / stats.Item3.TotalSeconds > (double)statistics.NumOfLetters / statistics.CorrectLetters && // по вермени
-            ((double)stats.Item1 / word.Length) * 100 >= 80) // по процентам
+        if (statistics is not null && testWords.Length / stats.Item3.TotalSeconds > (double)statistics.NumOfLetters / statistics.CorrectLetters && // по вермени
+            ((double)stats.Item1 / testWords.Length) * 100 >= 80) // по процентам
         {
             Console.WriteLine("\n\t\tNEW WORLD RECORD!\n");
-            Statistics newStatistics = new Statistics { Time = stats.Item3 , CorrectLetters = stats.Item1, WrongLetters = stats.Item2, NumOfLetters = word.Length };
+            Statistics newStatistics = new Statistics { Time = stats.Item3 , CorrectLetters = stats.Item1, WrongLetters = stats.Item2, NumOfLetters = testWords.Length };
             Program.Client.SendAsync($"UPDATE record|{JsonSerializer.Serialize(newStatistics)}");
             
             bool statusCode = Convert.ToBoolean(await Program.Client.ReceiveAsync());
@@ -93,5 +108,12 @@ public static class Game
     
         Console.WriteLine("Press Enter to continue...");
         Console.ReadLine();
+    }
+
+    private string[] GenerateWords(string[] wordsDictionary)
+    {
+        return wordsDictionary.OrderBy(x => random.Next())
+            .Take(random.Next(6, 8))
+            .ToArray();
     }
 }
