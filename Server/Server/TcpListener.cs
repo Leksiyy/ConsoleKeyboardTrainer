@@ -27,7 +27,7 @@ public class MyTcpListener
 
     public async Task HandleClientAsync(TcpClient tcpClient)
     {
-        while (true)
+        while (tcpClient.GetStream().CanRead == true && tcpClient.Connected == true)
         {
             byte[] buffer = new byte[1024];
             try
@@ -66,10 +66,12 @@ public class MyTcpListener
                 byte[] sendBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(await GetStatisticsAsync()));
                 await networkStream.WriteAsync(sendBytes, 0, sendBytes.Length);
                 break;
+            
             case "update":
-                byte[] updateBytes = Encoding.UTF8.GetBytes(Convert.ToString(await UpdateStatisticsAsync(message)));
+                byte[] updateBytes = Encoding.UTF8.GetBytes(Convert.ToString(await UpdateStatisticsAsync(secondPart)));
                 await networkStream.WriteAsync(updateBytes, 0, updateBytes.Length);
                 break;
+            
             default:
                 break;
         }
@@ -86,10 +88,23 @@ public class MyTcpListener
 
     public async Task<bool> UpdateStatisticsAsync(string statistics)
     {
-        Statistics newStatistics = JsonSerializer.Deserialize<Statistics>(statistics);
+        int splitMessage = statistics.IndexOf('|');
+        string json = string.Empty;
+        if (splitMessage != -1)
+        {
+            json = statistics.Substring(splitMessage + 1);
+        }
+        
+        Statistics newStatistics = JsonSerializer.Deserialize<Statistics>(json);
         using (ApplicationContext context = Program.DbContext())
         {
             Statistics oldStatistics = context.Statistics.FirstOrDefault();
+            if (oldStatistics == null)
+            {
+                context.Statistics.Add(newStatistics);
+                context.SaveChanges();
+            }
+            
             if (newStatistics is not null && oldStatistics is not null)
             {
                 oldStatistics.Time = newStatistics.Time;

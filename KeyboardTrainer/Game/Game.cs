@@ -58,7 +58,7 @@ public class Game
             
             char inputChar = keyInfo.KeyChar;
 
-            if (keyInfo.Key == ConsoleKey.Spacebar)
+            if (keyInfo.Key == ConsoleKey.Spacebar && inputChar != testWords[index])
             {
                 Console.BackgroundColor = ConsoleColor.Red;
                 Console.Write(inputChar);
@@ -91,19 +91,30 @@ public class Game
         Console.ResetColor();
         
         Console.WriteLine($"\nSTATS:\nTime taken: {stats.Item3.Seconds} seconds\nNumber of incorrect letters: {stats.Item2}\nAccuracy: {((double)stats.Item1 / testWords.Length)*100:F2}%");
-
         Program.Client.SendAsync("SEND record");
         string recordJson = await Program.Client.ReceiveAsync();
-        Statistics statistics = JsonSerializer.Deserialize<Statistics>(recordJson);
+        Statistics statistics;
+        if (recordJson != "False")
+        {
+            statistics = JsonSerializer.Deserialize<Statistics>(recordJson);
+        }
+        else
+        {
+            statistics = null;
+        }
+        Statistics newStatistics = new Statistics { Time = stats.Item3 , CorrectLetters = stats.Item1, WrongLetters = stats.Item2, NumOfLetters = testWords.Length };
         if (statistics is not null && testWords.Length / stats.Item3.TotalSeconds > (double)statistics.NumOfLetters / statistics.CorrectLetters && // по вермени
             ((double)stats.Item1 / testWords.Length) * 100 >= 80) // по процентам
         {
             Console.WriteLine("\n\t\tNEW WORLD RECORD!\n");
-            Statistics newStatistics = new Statistics { Time = stats.Item3 , CorrectLetters = stats.Item1, WrongLetters = stats.Item2, NumOfLetters = testWords.Length };
             Program.Client.SendAsync($"UPDATE record|{JsonSerializer.Serialize(newStatistics)}");
             
             bool statusCode = Convert.ToBoolean(await Program.Client.ReceiveAsync());
             Console.WriteLine(statusCode ? "World record successfully updated!" : "Can't update world record!");
+        } else if (statistics is null)
+        {
+            Console.WriteLine("\n\t\tNEW WORLD RECORD!\n");
+            Program.Client.SendAsync($"UPDATE record|{JsonSerializer.Serialize(newStatistics)}");
         }
     
         Console.WriteLine("Press Enter to continue...");
